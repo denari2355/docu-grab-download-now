@@ -61,7 +61,28 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				windows: {
+					blue: 'hsl(var(--windows-blue))',
+					'blue-light': 'hsl(var(--windows-blue-light))',
+					'blue-dark': 'hsl(var(--windows-blue-dark))',
+					gray: 'hsl(var(--windows-gray))',
+					'gray-dark': 'hsl(var(--windows-gray-dark))',
+					accent: 'hsl(var(--windows-accent))'
 				}
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-hero': 'var(--gradient-hero)'
+			},
+			boxShadow: {
+				'glass': 'var(--shadow-glass)',
+				'card-custom': 'var(--shadow-card)',
+				'button-custom': 'var(--shadow-button)'
+			},
+			backdropBlur: {
+				'glass': '10px'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
