@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,12 +14,47 @@ import {
   X,
   CheckCircle,
   AlertCircle,
-  Settings
+  Settings,
+  Menu,
+  Home,
+  Info,
+  BookOpen,
+  Download as DownloadIcon
 } from "lucide-react";
 
 const Index = () => {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [activeSection, setActiveSection] = useState("home");
   const { toast } = useToast();
+
+  // Update active section based on scroll position
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = ["home", "features", "how-it-works", "installation", "download"];
+      const scrollPosition = window.scrollY + 100;
+
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
+            setActiveSection(section);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -78,8 +113,76 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero">
+      {/* Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                FileGrabber
+              </span>
+            </div>
+            
+            <div className="hidden md:flex items-center space-x-8">
+              <button
+                onClick={() => scrollToSection("home")}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  activeSection === "home" ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Home className="inline w-4 h-4 mr-1" />
+                Home
+              </button>
+              <button
+                onClick={() => scrollToSection("features")}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  activeSection === "features" ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Zap className="inline w-4 h-4 mr-1" />
+                Features
+              </button>
+              <button
+                onClick={() => scrollToSection("how-it-works")}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  activeSection === "how-it-works" ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Info className="inline w-4 h-4 mr-1" />
+                How It Works
+              </button>
+              <button
+                onClick={() => scrollToSection("installation")}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  activeSection === "installation" ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <BookOpen className="inline w-4 h-4 mr-1" />
+                Installation
+              </button>
+            </div>
+
+            <Button
+              onClick={() => scrollToSection("download")}
+              size="sm"
+              className="hidden md:flex bg-gradient-primary hover:opacity-95 text-white"
+            >
+              <DownloadIcon className="mr-2 h-4 w-4" />
+              Download
+            </Button>
+
+            <Button variant="ghost" size="sm" className="md:hidden">
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </nav>
+
       {/* Hero Section */}
-      <section className="relative px-4 py-20 text-center">
+      <section id="home" className="relative px-4 py-20 pt-32 text-center">{/* Added pt-32 for nav spacing */}
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         
         <div className="relative mx-auto max-w-4xl">
@@ -127,7 +230,7 @@ const Index = () => {
       </section>
 
       {/* Features Section */}
-      <section className="px-4 py-20">
+      <section id="features" className="px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Why Choose FileGrabber?</h2>
@@ -159,7 +262,7 @@ const Index = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="px-4 py-20 bg-muted/30">
+      <section id="how-it-works" className="px-4 py-20 bg-muted/30">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">How It Works</h2>
@@ -203,7 +306,7 @@ const Index = () => {
       </section>
 
       {/* Installation Instructions */}
-      <section className="px-4 py-20">
+      <section id="installation" className="px-4 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Installation Guide</h2>
@@ -281,7 +384,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="px-4 py-20 bg-gradient-primary text-white">
+      <section id="download" className="px-4 py-20 bg-gradient-primary text-white">
         <div className="mx-auto max-w-4xl text-center">
           <h2 className="text-4xl font-bold mb-4">Ready to Boost Your Productivity?</h2>
           <p className="text-xl mb-8 opacity-90">
