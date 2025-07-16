@@ -4,45 +4,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useExtensionDownload } from "@/hooks/useExtensionDownload";
-import { 
-  Download, 
-  FileText, 
-  Shield, 
-  Zap, 
-  Monitor,
-  Chrome,
-  MousePointer,
-  X,
-  CheckCircle,
-  AlertCircle,
-  Settings,
-  Menu,
-  Home,
-  Info,
-  BookOpen,
-  Download as DownloadIcon,
-  Star,
-  Quote,
-  Users,
-  Scale,
-  Eye
-} from "lucide-react";
-
+import { Download, FileText, Shield, Zap, Monitor, Chrome, MousePointer, X, CheckCircle, AlertCircle, Settings, Menu, Home, Info, BookOpen, Download as DownloadIcon, Star, Quote, Users, Scale, Eye } from "lucide-react";
 const Index = () => {
   const [activeSection, setActiveSection] = useState("home");
-  const { downloadExtension, isDownloading } = useExtensionDownload();
-  const { toast } = useToast();
+  const {
+    downloadExtension,
+    isDownloading
+  } = useExtensionDownload();
+  const {
+    toast
+  } = useToast();
 
   // Update active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
       const sections = ["home", "features", "how-it-works", "installation", "testimonials", "download"];
       const scrollPosition = window.scrollY + 100;
-
       for (const section of sections) {
         const element = document.getElementById(section);
         if (element) {
-          const { offsetTop, offsetHeight } = element;
+          const {
+            offsetTop,
+            offsetHeight
+          } = element;
           if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
             setActiveSection(section);
             break;
@@ -50,57 +34,46 @@ const Index = () => {
         }
       }
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({
+        behavior: 'smooth'
+      });
     }
   };
-
   const handleDownload = () => {
     downloadExtension();
   };
-
-  const features = [
-    {
-      icon: FileText,
-      title: "Smart Document Detection",
-      description: "Automatically detects all types of documents on any webpage including PDFs, DOCs, images, and more."
-    },
-    {
-      icon: MousePointer,
-      title: "One-Click Downloads",
-      description: "Simple download button appears below each document with an optional close button to minimize distractions."
-    },
-    {
-      icon: Shield,
-      title: "Safe & Secure",
-      description: "Built with security in mind. No data collection, no tracking, just pure functionality."
-    },
-    {
-      icon: Zap,
-      title: "Lightning Fast",
-      description: "Optimized for speed with minimal resource usage. Works seamlessly in the background."
-    },
-    {
-      icon: Monitor,
-      title: "Cross-Browser Support",
-      description: "Works perfectly with Chrome, Edge, and other Chromium-based browsers."
-    },
-    {
-      icon: Settings,
-      title: "Customizable",
-      description: "Adjust settings to match your workflow. Control button visibility and download behavior."
-    }
-  ];
-
-  return (
-    <div className="min-h-screen bg-gradient-hero">
+  const features = [{
+    icon: FileText,
+    title: "Smart Document Detection",
+    description: "Automatically detects all types of documents on any webpage including PDFs, DOCs, images, and more."
+  }, {
+    icon: MousePointer,
+    title: "One-Click Downloads",
+    description: "Simple download button appears below each document with an optional close button to minimize distractions."
+  }, {
+    icon: Shield,
+    title: "Safe & Secure",
+    description: "Built with security in mind. No data collection, no tracking, just pure functionality."
+  }, {
+    icon: Zap,
+    title: "Lightning Fast",
+    description: "Optimized for speed with minimal resource usage. Works seamlessly in the background."
+  }, {
+    icon: Monitor,
+    title: "Cross-Browser Support",
+    description: "Works perfectly with Chrome, Edge, and other Chromium-based browsers."
+  }, {
+    icon: Settings,
+    title: "Customizable",
+    description: "Adjust settings to match your workflow. Control button visibility and download behavior."
+  }];
+  return <div className="min-h-screen bg-gradient-hero">
       {/* Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border/40">
         <div className="container mx-auto max-w-6xl px-4">
@@ -115,58 +88,29 @@ const Index = () => {
             </div>
             
             <div className="hidden md:flex items-center space-x-8">
-              <button
-                onClick={() => scrollToSection("home")}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === "home" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
+              <button onClick={() => scrollToSection("home")} className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === "home" ? "text-primary" : "text-muted-foreground"}`}>
                 <Home className="inline w-4 h-4 mr-1" />
                 Home
               </button>
-              <button
-                onClick={() => scrollToSection("features")}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === "features" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
+              <button onClick={() => scrollToSection("features")} className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === "features" ? "text-primary" : "text-muted-foreground"}`}>
                 <Zap className="inline w-4 h-4 mr-1" />
                 Features
               </button>
-              <button
-                onClick={() => scrollToSection("how-it-works")}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === "how-it-works" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
+              <button onClick={() => scrollToSection("how-it-works")} className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === "how-it-works" ? "text-primary" : "text-muted-foreground"}`}>
                 <Info className="inline w-4 h-4 mr-1" />
                 How It Works
               </button>
-              <button
-                onClick={() => scrollToSection("installation")}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === "installation" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
+              <button onClick={() => scrollToSection("installation")} className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === "installation" ? "text-primary" : "text-muted-foreground"}`}>
                 <BookOpen className="inline w-4 h-4 mr-1" />
                 Installation
               </button>
-              <button
-                onClick={() => scrollToSection("testimonials")}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  activeSection === "testimonials" ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
+              <button onClick={() => scrollToSection("testimonials")} className={`text-sm font-medium transition-colors hover:text-primary ${activeSection === "testimonials" ? "text-primary" : "text-muted-foreground"}`}>
                 <Users className="inline w-4 h-4 mr-1" />
                 Testimonials
               </button>
             </div>
 
-            <Button
-              onClick={() => scrollToSection("download")}
-              size="sm"
-              className="hidden md:flex bg-gradient-primary hover:opacity-95 text-white"
-            >
+            <Button onClick={() => scrollToSection("download")} size="sm" className="hidden md:flex bg-gradient-primary hover:opacity-95 text-white">
               <DownloadIcon className="mr-2 h-4 w-4" />
               Download
             </Button>
@@ -199,23 +143,14 @@ const Index = () => {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button 
-              size="lg" 
-              onClick={handleDownload}
-              disabled={isDownloading}
-              className="px-8 py-6 text-lg font-semibold shadow-button-custom hover:shadow-lg transition-all duration-300"
-            >
-              {isDownloading ? (
-                <>
+            <Button size="lg" onClick={handleDownload} disabled={isDownloading} className="px-8 py-6 text-lg font-semibold shadow-button-custom hover:shadow-lg transition-all duration-300">
+              {isDownloading ? <>
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
                   Preparing Download...
-                </>
-              ) : (
-                <>
+                </> : <>
                   <Download className="mr-2 h-5 w-5" />
                   Download Extension
-                </>
-              )}
+                </>}
             </Button>
             
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -237,8 +172,7 @@ const Index = () => {
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <Card key={index} className="bg-gradient-card border-0 shadow-card-custom backdrop-blur-sm">
+            {features.map((feature, index) => <Card key={index} className="bg-gradient-card border-0 shadow-card-custom backdrop-blur-sm">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
                     <div className="p-2 rounded-lg bg-primary/10">
@@ -252,8 +186,7 @@ const Index = () => {
                     {feature.description}
                   </CardDescription>
                 </CardContent>
-              </Card>
-            ))}
+              </Card>)}
           </div>
         </div>
       </section>
@@ -395,9 +328,7 @@ const Index = () => {
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                    ))}
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-primary text-primary" />)}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -422,9 +353,7 @@ const Index = () => {
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                    ))}
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-primary text-primary" />)}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -449,9 +378,7 @@ const Index = () => {
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
                   <div className="flex gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
-                    ))}
+                    {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-primary text-primary" />)}
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -483,24 +410,14 @@ const Index = () => {
             Join thousands of users who have streamlined their document workflow with FileGrabber.
           </p>
           
-          <Button 
-            size="lg" 
-            variant="secondary"
-            onClick={handleDownload}
-            disabled={isDownloading}
-            className="px-8 py-6 text-lg font-semibold"
-          >
-            {isDownloading ? (
-              <>
+          <Button size="lg" variant="secondary" onClick={handleDownload} disabled={isDownloading} className="px-8 py-6 text-lg font-semibold">
+            {isDownloading ? <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-current mr-2" />
                 Preparing Download...
-              </>
-            ) : (
-              <>
+              </> : <>
                 <Download className="mr-2 h-5 w-5" />
                 Download Now
-              </>
-            )}
+              </>}
           </Button>
           
           <div className="mt-12 text-center text-sm opacity-80">
@@ -555,12 +472,10 @@ const Index = () => {
           </div>
           
           <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-            <p>© 2024 FileGrabber. Built for enhanced productivity and seamless document management.</p>
+            <p> 2025 FileGrabber. Built for enhanced productivity and seamless document management.</p>
           </div>
         </div>
       </section>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
