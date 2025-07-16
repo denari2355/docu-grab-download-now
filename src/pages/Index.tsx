@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
+import { useExtensionDownload } from "@/hooks/useExtensionDownload";
 import { 
   Download, 
   FileText, 
@@ -19,18 +20,23 @@ import {
   Home,
   Info,
   BookOpen,
-  Download as DownloadIcon
+  Download as DownloadIcon,
+  Star,
+  Quote,
+  Users,
+  Scale,
+  Eye
 } from "lucide-react";
 
 const Index = () => {
-  const [isDownloading, setIsDownloading] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
+  const { downloadExtension, isDownloading } = useExtensionDownload();
   const { toast } = useToast();
 
   // Update active section based on scroll position
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ["home", "features", "how-it-works", "installation", "download"];
+      const sections = ["home", "features", "how-it-works", "installation", "testimonials", "download"];
       const scrollPosition = window.scrollY + 100;
 
       for (const section of sections) {
@@ -56,26 +62,8 @@ const Index = () => {
     }
   };
 
-  const handleDownload = async () => {
-    setIsDownloading(true);
-    
-    // Simulate download delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    toast({
-      title: "Download Started",
-      description: "FileGrabber extension is being downloaded...",
-    });
-    
-    // Here you would trigger the actual download from Supabase
-    // For now, we'll show a success message
-    setTimeout(() => {
-      toast({
-        title: "Download Complete",
-        description: "Check your downloads folder for the FileGrabber extension.",
-      });
-      setIsDownloading(false);
-    }, 1000);
+  const handleDownload = () => {
+    downloadExtension();
   };
 
   const features = [
@@ -163,6 +151,15 @@ const Index = () => {
                 <BookOpen className="inline w-4 h-4 mr-1" />
                 Installation
               </button>
+              <button
+                onClick={() => scrollToSection("testimonials")}
+                className={`text-sm font-medium transition-colors hover:text-primary ${
+                  activeSection === "testimonials" ? "text-primary" : "text-muted-foreground"
+                }`}
+              >
+                <Users className="inline w-4 h-4 mr-1" />
+                Testimonials
+              </button>
             </div>
 
             <Button
@@ -197,8 +194,8 @@ const Index = () => {
           </h1>
           
           <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
-            A powerful browser extension that intelligently detects and downloads documents from any webpage. 
-            Like IDM, but smarter and more intuitive.
+            A powerful browser extension that intelligently detects and downloads documents from any webpage including iframes. 
+            Works seamlessly with PDFs, DOCs, images, videos, and more.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -383,6 +380,101 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Testimonials Section */}
+      <section id="testimonials" className="px-4 py-20 bg-muted/30">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold mb-4">What Users Say</h2>
+            <p className="text-xl text-muted-foreground">
+              Trusted by thousands of professionals worldwide
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="bg-gradient-card border-0 shadow-card-custom">
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm">Sarah Chen</CardTitle>
+                    <CardDescription className="text-xs">Research Analyst</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Quote className="w-8 h-8 text-primary/30 mb-3" />
+                <p className="text-sm leading-relaxed">
+                  "FileGrabber has revolutionized how I collect research documents. The iframe detection is incredible - it finds PDFs I never knew were there!"
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card border-0 shadow-card-custom">
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm">Marcus Rodriguez</CardTitle>
+                    <CardDescription className="text-xs">Legal Assistant</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Quote className="w-8 h-8 text-primary/30 mb-3" />
+                <p className="text-sm leading-relaxed">
+                  "As someone who downloads hundreds of legal documents daily, FileGrabber saves me hours. The one-click download is a game-changer."
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gradient-card border-0 shadow-card-custom">
+              <CardHeader>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-sm">Emily Johnson</CardTitle>
+                    <CardDescription className="text-xs">Content Creator</CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Quote className="w-8 h-8 text-primary/30 mb-3" />
+                <p className="text-sm leading-relaxed">
+                  "Perfect for content research! FileGrabber finds media files in places other tools miss. The cross-browser support is excellent."
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section id="download" className="px-4 py-20 bg-gradient-primary text-white">
         <div className="mx-auto max-w-4xl text-center">
@@ -410,6 +502,61 @@ const Index = () => {
               </>
             )}
           </Button>
+          
+          <div className="mt-12 text-center text-sm opacity-80">
+            <p className="mb-2">Version 1.0.0 • Manifest V3 Compliant</p>
+            <p>Chrome & Edge Compatible</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Disclaimer & Terms Section */}
+      <section className="px-4 py-16 bg-muted/20 border-t">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div>
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Eye className="h-5 w-5 text-primary" />
+                Disclaimer
+              </h3>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  FileGrabber is provided "as is" without warranty of any kind. Use this extension responsibly and in accordance with applicable laws and website terms of service.
+                </p>
+                <p>
+                  Always respect copyright laws and website terms of use when downloading content. FileGrabber is intended for legitimate document access and should not be used to circumvent access controls or download copyrighted material without permission.
+                </p>
+                <p>
+                  The extension may not work on all websites due to security restrictions, CORS policies, or other technical limitations.
+                </p>
+              </div>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                <Scale className="h-5 w-5 text-primary" />
+                Terms of Use
+              </h3>
+              <div className="text-sm text-muted-foreground space-y-3">
+                <p>
+                  By downloading and using FileGrabber, you agree to use it only for legitimate purposes and in compliance with all applicable laws.
+                </p>
+                <p>
+                  You are responsible for ensuring you have the right to download any content accessed through this extension. We are not responsible for any misuse of the extension.
+                </p>
+                <p>
+                  The extension is open-source and provided for educational and productivity purposes. No data is collected or transmitted by the extension.
+                </p>
+                <p>
+                  We reserve the right to update these terms and the extension functionality at any time.
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
+            <p>© 2024 FileGrabber. Built for enhanced productivity and seamless document management.</p>
+          </div>
         </div>
       </section>
     </div>

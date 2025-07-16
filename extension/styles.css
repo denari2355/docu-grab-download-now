@@ -1,0 +1,175 @@
+/* FileGrabber Extension Styles */
+
+.fg-download-button {
+  display: inline-block;
+  margin: 8px 4px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  z-index: 10000;
+  position: relative;
+}
+
+.fg-button-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  padding: 2px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+  transition: all 0.2s ease;
+}
+
+.fg-button-container:hover {
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.fg-download-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: white;
+  color: #667eea;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none !important;
+}
+
+.fg-download-btn:hover {
+  background: #f8fafc;
+  color: #5a67d8;
+}
+
+.fg-download-btn:active {
+  transform: scale(0.98);
+}
+
+.fg-download-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.fg-close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fg-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.fg-file-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 10px;
+}
+
+.fg-file-type {
+  background: rgba(102, 126, 234, 0.1);
+  color: #667eea;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.fg-file-name {
+  color: #64748b;
+  font-weight: 500;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Iframe overlay styles */
+.fg-iframe-container {
+  position: relative !important;
+  display: inline-block !important;
+}
+
+.fg-iframe-overlay {
+  position: absolute !important;
+  top: 8px !important;
+  right: 8px !important;
+  z-index: 10001 !important;
+}
+
+.fg-iframe-overlay .fg-button-container {
+  background: rgba(102, 126, 234, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.fg-iframe-overlay .fg-download-btn {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .fg-download-btn {
+    background: #1e293b;
+    color: #94a3b8;
+  }
+  
+  .fg-download-btn:hover {
+    background: #334155;
+    color: #cbd5e1;
+  }
+  
+  .fg-file-type {
+    background: rgba(102, 126, 234, 0.2);
+    color: #a5b4fc;
+  }
+  
+  .fg-file-name {
+    color: #94a3b8;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .fg-download-button {
+    margin: 4px 2px;
+  }
+  
+  .fg-download-btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .fg-file-info {
+    font-size: 9px;
+  }
+}
+
+/* Animation for new buttons */
+.fg-download-button {
+  animation: fadeInUp 0.3s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
