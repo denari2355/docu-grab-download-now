@@ -1,273 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FileGrabber</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      width: 350px;
-      min-height: 400px;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-family: Arial, sans-serif;
+      padding: 10px;
+      width: 300px;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: white;
+      margin: 0;
     }
-
+    
     .header {
-      padding: 20px;
       text-align: center;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      margin-bottom: 20px;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .logo svg {
-      width: 24px;
-      height: 24px;
-    }
-
+    
     .title {
       font-size: 18px;
-      font-weight: 700;
+      font-weight: bold;
+      margin-bottom: 5px;
     }
-
+    
     .version {
       font-size: 12px;
       opacity: 0.8;
-      margin-top: 4px;
     }
-
-    .content {
-      padding: 20px;
-    }
-
-    .documents-section {
-      margin-bottom: 20px;
-    }
-
-    .section-title {
-      font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 12px;
+    
+    .toggle-container {
       display: flex;
       align-items: center;
-      gap: 8px;
-    }
-
-    .documents-list {
+      justify-content: space-between;
+      margin-bottom: 15px;
+      padding: 10px;
       background: rgba(255, 255, 255, 0.1);
       border-radius: 8px;
-      overflow: hidden;
     }
-
-    .document-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .document-item:last-child {
-      border-bottom: none;
-    }
-
-    .document-info {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .document-name {
-      font-size: 13px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .document-type {
-      font-size: 11px;
-      opacity: 0.8;
-      text-transform: uppercase;
-    }
-
-    .download-btn {
-      background: white;
-      color: #667eea;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .download-btn:hover {
-      background: #f8fafc;
-      transform: scale(1.05);
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      opacity: 0.8;
-    }
-
-    .empty-state svg {
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-      opacity: 0.6;
-    }
-
-    .settings-section {
-      border-top: 1px solid rgba(255, 255, 255, 0.2);
-      padding-top: 16px;
-    }
-
-    .setting-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 0;
-    }
-
+    
     .toggle {
       position: relative;
-      width: 40px;
-      height: 20px;
+      width: 50px;
+      height: 24px;
       background: rgba(255, 255, 255, 0.3);
-      border-radius: 20px;
+      border-radius: 24px;
       cursor: pointer;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
-
+    
     .toggle.active {
-      background: white;
+      background: #4CAF50;
     }
-
+    
     .toggle::after {
       content: '';
       position: absolute;
       top: 2px;
       left: 2px;
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
       background: white;
       border-radius: 50%;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
     }
-
+    
     .toggle.active::after {
-      background: #667eea;
-      transform: translateX(20px);
+      transform: translateX(26px);
     }
-
-    .footer {
-      margin-top: 20px;
-      text-align: center;
-      font-size: 11px;
-      opacity: 0.7;
+    
+    #files {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      min-height: 100px;
     }
-
-    .refresh-btn {
-      background: rgba(255, 255, 255, 0.2);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
+    
+    button {
+      margin-top: 5px;
+      padding: 8px 12px;
       font-size: 12px;
+      background: white;
+      color: #667eea;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
       transition: all 0.2s ease;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin: 0 auto 16px;
     }
-
-    .refresh-btn:hover {
-      background: rgba(255, 255, 255, 0.3);
+    
+    button:hover {
+      background: #f0f0f0;
+      transform: scale(1.05);
+    }
+    
+    p {
+      margin: 8px 0;
+      font-size: 13px;
+    }
+    
+    a {
+      color: #fff;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <div class="header">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-        <polyline points="14,2 14,8 20,8"/>
-        <line x1="16" y1="13" x2="8" y2="13"/>
-        <line x1="16" y1="17" x2="8" y2="17"/>
-        <polyline points="10,9 9,9 8,9"/>
-      </svg>
-      <span class="title">FileGrabber</span>
-    </div>
-    <div class="version">Version 1.0.0</div>
+    <h3 class="title">FileGrabber</h3>
+    <div class="version">Version 1.1</div>
   </div>
-
-  <div class="content">
-    <button class="refresh-btn" id="refreshBtn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="23 4 23 10 17 10"/>
-        <polyline points="1 20 1 14 7 14"/>
-        <path d="m3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-      </svg>
-      Scan Page
-    </button>
-
-    <div class="documents-section">
-      <div class="section-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-          <polyline points="14,2 14,8 20,8"/>
-        </svg>
-        Detected Documents
-      </div>
-      
-      <div id="documentsList" class="documents-list">
-        <!-- Documents will be populated here -->
-      </div>
-    </div>
-
-    <div class="settings-section">
-      <div class="section-title">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="3"/>
-          <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-        </svg>
-        Settings
-      </div>
-      
-      <div class="setting-item">
-        <span>Auto-detect documents</span>
-        <div class="toggle active" id="autoDetectToggle"></div>
-      </div>
-      
-      <div class="setting-item">
-        <span>Show notifications</span>
-        <div class="toggle active" id="notificationsToggle"></div>
-      </div>
-    </div>
-
-    <div class="footer">
-      Developed for enhanced productivity
-    </div>
+  
+  <div class="toggle-container">
+    <span>Extension ON/OFF</span>
+    <div class="toggle active" id="extensionToggle"></div>
   </div>
-
-  <script src="popup.js"></script>
+  
+  <div id="files"></div>
+  
+  <script>
+    // Handle extension toggle
+    document.getElementById('extensionToggle').addEventListener('click', function() {
+      this.classList.toggle('active');
+      const isActive = this.classList.contains('active');
+      
+      // Store the state
+      chrome.storage.local.set({ extensionEnabled: isActive });
+      
+      // Send message to content script
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, { 
+          action: "toggleExtension", 
+          enabled: isActive 
+        });
+      });
+    });
+    
+    // Load toggle state
+    chrome.storage.local.get(['extensionEnabled'], (result) => {
+      const toggle = document.getElementById('extensionToggle');
+      if (result.extensionEnabled === false) {
+        toggle.classList.remove('active');
+      }
+    });
+  </script>
 </body>
+<script src="popup.js"></script>
 </html>

@@ -1,57 +1,59 @@
-// FileGrabber Background Service Worker - Manifest V3
-console.log('FileGrabber background script loaded');
+// Store found files
+let foundFiles = [];
 
-// Track detected documents across tabs
-const detectedDocuments = new Map();
+// Listen for downloads from content or popup
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg.action === "download" && msg.url) {
+    chrome.downloads.download({ url: msg.url });
+  }
+});
 
-// Document patterns for detection
-const documentPatterns = {
-  pdf: /\.(pdf)(\?|$|#)/i,
-  doc: /\.(doc|docx|rtf|odt)(\?|$|#)/i,
-  spreadsheet: /\.(xls|xlsx|ods|csv)(\?|$|#)/i,
-  presentation: /\.(ppt|pptx|odp)(\?|$|#)/i,
-  archive: /\.(zip|rar|7z|tar|gz|bz2)(\?|$|#)/i,
-  image: /\.(jpg|jpeg|png|gif|bmp|svg|webp|tiff)(\?|$|#)/i,
-  video: /\.(mp4|avi|mkv|mov|wmv|flv|webm|m4v)(\?|$|#)/i,
-  audio: /\.(mp3|wav|flac|aac|ogg|wma|m4a)(\?|$|#)/i,
-  text: /\.(txt|md|log|json|xml|html|htm)(\?|$|#)/i
-};
+// Sniff ALL requests for possible files
+chrome.webRequest.onCompleted.addListener(
+  function (details) {
+    const url = details.url.toLowerCase();
+    if (url.match(/\.(pdf|docx|pptx|xls|xlsx|zip|rar|mp4|mp3|png|jpg|jpeg|txt)$/)) {
+      console.log("[FileGrabber] Found by URL:", url);
+      addFoundFile(url);
+    }
+    if (details.responseHeaders) {
+      const ct = details.responseHeaders.find(h => h.name.toLowerCase() === 'content-type');
+      if (ct && ct.value && (
+        ct.value.includes("application/pdf") ||
+        ct.value.includes("application/msword") ||
+        ct.value.includes("application/vnd")
+      )) {
+        console.log("[FileGrabber] Found by Content-Type:", url);
+        addFoundFile(url);
+      }
+    }
+  },
+  { urls: ["<all_urls>"] },
+  ["responseHeaders"]
+);
 
-// Initialize extension
+// Save found files
+function addFoundFile(url) {
+  if (!foundFiles.includes(url)) {
+    foundFiles.push(url);
+    chrome.storage.local.set({ foundFiles: foundFiles });
+  }
+}
+
+// Context menu to grab any link or media
 chrome.runtime.onInstalled.addListener(() => {
-  console.log('FileGrabber extension installed');
-  
-  // Set default settings
-  chrome.storage.local.set({
-    autoDetect: true,
-    showNotifications: true,
-    downloadLocation: 'default'
+  chrome.contextMenus.create({
+    id: "filegrabber",
+    title: "Download with FileGrabber",
+    contexts: ["link", "image", "video", "audio"]
   });
 });
 
-// Handle messages from content scripts
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log('Background received message:', message);
-  
-  switch (message.type) {
-    case 'DOCUMENT_DETECTED':
-      handleDocumentDetected(message.data, sender.tab);
-      break;
-      
-    case 'DOWNLOAD_DOCUMENT':
-      handleDownloadDocument(message.data, sender.tab);
-      break;
-      
-    case 'GET_DETECTED_DOCUMENTS':
-      sendResponse(detectedDocuments.get(sender.tab.id) || []);
-      break;
-      
-    case 'IFRAME_SCAN_REQUEST':
-      handleIframeScan(message.data, sender.tab);
-      break;
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  const fileUrl = info.linkUrl || info.srcUrl;
+  if (fileUrl) {
+    chrome.downloads.download({ url: fileUrl });
   }
-  
-  return true; // Keep message channel open for async response
 });
 
 // Handle document detection
