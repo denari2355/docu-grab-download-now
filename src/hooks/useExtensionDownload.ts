@@ -23,75 +23,38 @@ export const useExtensionDownload = () => {
       setIsDownloading(true);
 
       toast({
-        title: "Preparing Download",
-        description: "Fetching extension files from server...",
+        title: "Starting download...",
+        description: "Preparing your FileGrabber extension",
       });
 
-      // Call the edge function to get download URLs
-      const { data, error } = await supabase.functions.invoke('download-extension');
-
-      if (error) {
-        throw new Error(error.message);
+      // Download the zip file directly
+      const response = await fetch('/FileGrabber-Extension.zip');
+      
+      if (!response.ok) {
+        throw new Error('Failed to download extension');
       }
 
-      const downloadData = data as DownloadResponse;
-
-      if (!downloadData.files || downloadData.files.length === 0) {
-        throw new Error('No extension files available');
-      }
-
-      toast({
-        title: "Download Started",
-        description: `Downloading ${downloadData.files.length} files...`,
-      });
-
-      // Download each file
-      let downloadedCount = 0;
-      const downloadPromises = downloadData.files.map(async (file) => {
-        try {
-          const response = await fetch(file.url);
-          if (!response.ok) {
-            throw new Error(`Failed to download ${file.name}`);
-          }
-
-          const blob = await response.blob();
-          
-          // Create download link
-          const url = window.URL.createObjectURL(blob);
-          const link = document.createElement('a');
-          link.href = url;
-          link.download = file.name;
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          window.URL.revokeObjectURL(url);
-
-          downloadedCount++;
-          
-          // Show progress
-          if (downloadedCount < downloadData.files.length) {
-            toast({
-              title: "Download Progress",
-              description: `Downloaded ${downloadedCount}/${downloadData.files.length} files`,
-            });
-          }
-        } catch (error) {
-          console.error(`Error downloading ${file.name}:`, error);
-        }
-      });
-
-      await Promise.all(downloadPromises);
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = 'FileGrabber-Extension.zip';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
 
       toast({
-        title: "Download Complete",
-        description: `FileGrabber v${downloadData.version} downloaded successfully! Check your downloads folder.`,
+        title: "Download complete!",
+        description: "FileGrabber extension downloaded successfully",
       });
 
     } catch (error) {
       console.error('Download error:', error);
       toast({
-        title: "Download Failed",
-        description: error instanceof Error ? error.message : "Failed to download extension",
+        title: "Download failed",
+        description: "There was an error downloading the extension. Please try again.",
         variant: "destructive",
       });
     } finally {
