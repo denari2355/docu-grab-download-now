@@ -38,7 +38,7 @@ export const useExtensionDownload = () => {
           "manifest_version": 3,
           "name": "FileGrabber",
           "version": "1.1",
-          "description": "Grab and download any file, even hidden iframe documents",
+          "description": "Grab and download any file, even hidden documents.",
           "permissions": [
             "downloads",
             "scripting",
@@ -48,7 +48,9 @@ export const useExtensionDownload = () => {
             "storage",
             "contextMenus"
           ],
-          "host_permissions": ["<all_urls>"],
+          "host_permissions": [
+            "<all_urls>"
+          ],
           "background": {
             "service_worker": "background.js"
           },
@@ -70,20 +72,33 @@ export const useExtensionDownload = () => {
             "16": "icon.png",
             "48": "icon.png",
             "128": "icon.png"
+          },
+          "commands": {
+            "grab-now": {
+              "suggested_key": {
+                "default": "Ctrl+Shift+G"
+              },
+              "description": "Grab files now"
+            }
           }
         }, null, 2),
 
-        'background.js': `// Store found files
-let foundFiles = [];
+        'background.js': `let foundFiles = [];
 
-// Listen for downloads from content or popup
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
   if (msg.action === "download" && msg.url) {
-    chrome.downloads.download({ url: msg.url });
+    if (isValidURL(msg.url)) {
+      chrome.downloads.download({ url: msg.url });
+    }
+  }
+
+  if (msg.action === "setBadge") {
+    const count = msg.count || 0;
+    chrome.action.setBadgeText({ text: count.toString() });
+    chrome.action.setBadgeBackgroundColor({ color: "#0078d4" });
   }
 });
 
-// Sniff ALL requests for possible files
 chrome.webRequest.onCompleted.addListener(
   function (details) {
     const url = details.url.toLowerCase();
@@ -91,31 +106,38 @@ chrome.webRequest.onCompleted.addListener(
       console.log("[FileGrabber] Found by URL:", url);
       addFoundFile(url);
     }
-    if (details.responseHeaders) {
-      const ct = details.responseHeaders.find(h => h.name.toLowerCase() === 'content-type');
-      if (ct && ct.value && (
-        ct.value.includes("application/pdf") ||
-        ct.value.includes("application/msword") ||
-        ct.value.includes("application/vnd")
-      )) {
-        console.log("[FileGrabber] Found by Content-Type:", url);
-        addFoundFile(url);
-      }
+
+    const ct = details.responseHeaders?.find(h => h.name.toLowerCase() === 'content-type');
+    if (ct && ct.value && (
+      ct.value.includes("application/pdf") ||
+      ct.value.includes("application/msword") ||
+      ct.value.includes("application/vnd")
+    )) {
+      console.log("[FileGrabber] Found by Content-Type:", url);
+      addFoundFile(url);
     }
   },
   { urls: ["<all_urls>"] },
   ["responseHeaders"]
 );
 
-// Save found files
 function addFoundFile(url) {
   if (!foundFiles.includes(url)) {
     foundFiles.push(url);
-    chrome.storage.local.set({ foundFiles: foundFiles });
+    chrome.storage.local.set({ foundFiles });
+    chrome.action.setBadgeText({ text: foundFiles.length.toString() });
   }
 }
 
-// Context menu to grab any link or media
+function isValidURL(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "filegrabber",
@@ -124,24 +146,28 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.contextMenus.onClicked.addListener((info, tab) => {
+chrome.contextMenus.onClicked.addListener((info) => {
   const fileUrl = info.linkUrl || info.srcUrl;
-  if (fileUrl) {
+  if (fileUrl && isValidURL(fileUrl)) {
     chrome.downloads.download({ url: fileUrl });
+  }
+});
+
+// Shortcut support: Ctrl+Shift+G
+chrome.commands.onCommand.addListener((command) => {
+  if (command === "grab-now") {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      if (tabs[0]?.id) {
+        chrome.scripting.executeScript({
+          target: { tabId: tabs[0].id },
+          files: ["content.js"]
+        });
+      }
+    });
   }
 });`,
 
-        'content.js': `// === Block FileGrabber on YouTube ===
-if (window.location.hostname.includes("youtube.com")) {
-  console.log("[FileGrabber] Skipped on YouTube");
-  return; // stop the script entirely
-}
-if (window.location.hostname.includes("chatgpt.com")) {
-  console.log("[FileGrabber] Skipped on ChatGPT");
-  return; // stop the script entirely
-}
-
-// === Add style ===
+        'content.js': `// === Add style ===
 const style = document.createElement('style');
 style.textContent = \`
   .filegrabber-btn {
@@ -156,7 +182,7 @@ style.textContent = \`
     z-index: 99999;
   }
   .filegrabber-btn:hover {
-    background: #0056b3;
+    background: #064992ff;
   }
 \`;
 document.head.appendChild(style);
@@ -220,7 +246,6 @@ document.querySelectorAll("iframe").forEach(frame => {
 });
 
 // === Google Drive handler ===
-// === Google Drive handler (Button at Bottom) ===
 if (window.location.hostname.includes("drive.google.com")) {
   const observer = new MutationObserver(() => {
     const driveBtn = document.querySelector('[aria-label="Download"], div[aria-label*="Download"]');
@@ -228,15 +253,9 @@ if (window.location.hostname.includes("drive.google.com")) {
       const grabBtn = document.createElement("button");
       grabBtn.innerText = "FileGrab Drive";
       grabBtn.className = "filegrabber-btn filegrabber-btn-drive";
-      grabBtn.style.position = "fixed";
-      grabBtn.style.bottom = "20px";
-      grabBtn.style.right = "20px";
-      grabBtn.style.zIndex = "99999";
-
       grabBtn.onclick = () => {
         driveBtn.click();
       };
-
       document.body.appendChild(grabBtn);
     }
   });
@@ -244,170 +263,253 @@ if (window.location.hostname.includes("drive.google.com")) {
 }`,
 
         'popup.html': `<!DOCTYPE html>
-<html>
+<html lang="en">
+<div id="loading" style="display:none; text-align:center; margin-top:10px;">
+  <div class="spinner"></div>
+</div>
 <head>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      margin: 0;
-      padding: 20px;
-      width: 320px;
-      min-height: 200px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      box-sizing: border-box;
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      padding-bottom: 15px;
-    }
-    
-    h3 {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
-    
-    .version {
-      font-size: 12px;
-      opacity: 0.8;
-      margin-top: 5px;
-    }
-    
-    #files {
-      background: rgba(255,255,255,0.1);
-      border-radius: 8px;
-      padding: 15px;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-    
-    #files p {
-      margin: 8px 0;
-      font-size: 13px;
-      word-break: break-all;
-    }
-    
-    button {
-      background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-      color: white;
-      border: none;
-      padding: 8px 15px;
-      margin: 5px 0;
-      border-radius: 20px;
-      font-size: 12px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      font-weight: 500;
-    }
-    
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-    
-    button:active {
-      transform: translateY(0);
-    }
-    
-    a {
-      color: #FFE66D;
-      text-decoration: none;
-    }
-    
-    a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <meta charset="UTF-8" />
+  <title>FileGrabber</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    padding: 15px;
+    width: 320px;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #f0f0f0;
+    min-height: 100vh;
+    box-sizing: border-box;
+  }
+
+  h3 {
+    margin-top: 0;
+    color: #4FC3F7;
+    font-size: 20px;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  h5 {
+    color: #90caf9;
+    margin-top: -10px;
+    margin-bottom: 15px;
+  }
+
+  .file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    font-size: 13px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+  }
+
+  button {
+    background: linear-gradient(to right, #1e88e5, #42a5f5);
+    border: none;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.3s ease;
+  }
+
+  button:hover {
+    background: linear-gradient(to right, #1565c0, #1e88e5);
+  }
+
+  .message {
+    background: rgba(255, 244, 206, 0.2);
+    border: 1px solid #ffe399;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 12px;
+    margin-top: 10px;
+    color: #fff9c4;
+  }
+
+  a {
+    color: #90caf9;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+  .spinner {
+  border: 3px solid #ccc;
+  border-top: 3px solid #4FC3F7;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 0.8s linear infinite;
+  margin: auto;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+</style>
+
 </head>
 <body>
-  <div class="header">
-    <h3>FileGrabber</h3>
-    <div class="version">v1.1</div>
-  </div>
-  
+  <h3>📂 FileGrabber</h3>
+  <h5>Version 1.1</h5>
   <div id="files"></div>
+  
 </body>
+
 <script src="popup.js"></script>
 </html>`,
 
         'popup.js': `const filesDiv = document.getElementById("files");
+const loadingDiv = document.getElementById("loading");
 
-// Get current active tab URL
+// Show loading spinner
+loadingDiv.style.display = "block";
+
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
   const url = tabs[0].url;
 
-  // If user is on Scribd
-  if (url.includes("scribd.com")) {
+  // Special message for blocked sites
+  if (url.includes("scribd.com") || url.includes("studocu.com")) {
+    loadingDiv.style.display = "none";
     filesDiv.innerHTML = \`
-      <p>This page is a Scribd document.</p>
-      <p>Direct download is blocked by Scribd's security.</p>
-      <p>You can try this tool instead:</p>
-      <a href="https://scribd.vdownloaders.com/" target="_blank">Open Scribd Downloader</a>
+      <div class="message">
+        <p>This site blocks direct downloads.</p>
+        <p>Tip: Download IDM, then right-click the document and choose <strong>Download with IDM</strong>.</p>
+        <p>This works for Scribd and StuDocu.</p>
+      </div>
     \`;
     return;
   }
 
   // Normal file grabber logic
   chrome.storage.local.get("foundFiles", (data) => {
+    loadingDiv.style.display = "none";
     const files = data.foundFiles || [];
+
+    updateBadge(files.length);
+    saveToHistory(files);
+
     if (files.length === 0) {
       filesDiv.innerText = "No files sniffed yet.";
       return;
     }
 
     files.forEach(url => {
+      if (!isValidURL(url)) return;
+
       let fileName = url.split('/').pop().split('?')[0];
       if (!fileName || fileName.length === 0) {
         const match = url.match(/\\.(\\w{2,5})(\\?|$)/);
-        if (match && match[1]) {
-          fileName = \`[Unknown file] (.\${match[1]})\`;
-        } else {
-          fileName = \`[Unknown file]\`;
-        }
+        fileName = match ? \`[Unknown file] (.\${match[1]})\` : \`[Unknown file]\`;
       }
 
-      const p = document.createElement("p");
-      p.textContent = fileName;
+      const fileItem = document.createElement("div");
+      fileItem.className = "file-item";
+
+      const nameSpan = document.createElement("span");
+      nameSpan.textContent = fileName;
+
       const btn = document.createElement("button");
       btn.innerText = "Download";
       btn.onclick = () => {
-        chrome.runtime.sendMessage({ action: "download", url: url });
+        chrome.runtime.sendMessage({ action: "download", url });
       };
-      filesDiv.appendChild(p);
-      filesDiv.appendChild(btn);
+
+      fileItem.appendChild(nameSpan);
+      fileItem.appendChild(btn);
+      filesDiv.appendChild(fileItem);
     });
   });
-});`
+});
+
+function isValidURL(url) {
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+function saveToHistory(files) {
+  const timestamp = Date.now();
+  const entries = files.map(url => ({
+    name: url.split('/').pop().split('?')[0] || "Unknown",
+    url,
+    time: timestamp
+  }));
+
+  chrome.storage.local.get({ fileHistory: [] }, (data) => {
+    const updated = [...data.fileHistory, ...entries].slice(-100);
+    chrome.storage.local.set({ fileHistory: updated });
+  });
+}
+
+function updateBadge(count) {
+  chrome.runtime.sendMessage({ action: "setBadge", count });
+}`
       };
 
       // Add README file to zip
-      const readmeContent = `# FileGrabber Extension
+      const readmeContent = `=============Provided by: fgrabber.onrender.com=============
+(The extension is in the folder named File Grabber)
 
-A powerful browser extension that helps you grab and download any file from web pages, including hidden iframe documents.
+HOW TO LOAD THE EXTENSION ON A BROWSER:
+___________________________
+1. Go to your browser and go to the extensions page (on edge: edge://extensions on chrome: chrome://extensions)
 
-## Features
-- Sniffs network traffic for downloadable files
-- Adds download buttons to direct file links
-- Handles iframe documents and hidden links
-- Google Drive integration
-- Context menu support
-- Scribd detection with alternative download tool
+2. Enable developer mode
 
-## Installation
-1. Download and extract the FileGrabber extension
-2. Open Chrome and go to chrome://extensions/
-3. Enable "Developer mode"
-4. Click "Load unpacked" and select the File Grabber folder
-5. The extension is now ready to use!
+3.Press 'LOAD UNPACKED' and keep the folder named 'File Grabber'    Note: (Do not keep the folder named file grabber extension)
 
-## Version
-v1.1`;
+4.All steps must be followed for the extension to show on your browser
+
+
+HOW TO USE THE EXTENSION ON A BROWSER:
+
+___________________________  
+1. Go to a site with a document you want to download but cant download.
+
+2. A small blue box will appear next to the link to the file. (On some files the box will not show because the document is encrypted, read below to know what to do )
+
+3. Press 'grab file'
+
+4. The download will start.
+
+
+
+----------------------------------------------------------------------------------------------------
+1. On some sites where the document is in the site, a button 'Open Iframe' and 'Download document' will appear (When iframe is pressed it will vopen and view the document in a new tab)
+
+2.When the button download document is pressed, it will download a document called 'preview.htm' , this is only for specific sites (like revision sites for cbc/cbe )
+
+3. When you open the download, it will direct you to a page that says 'Preview not available' and a download button
+
+4. Press the download button and the document will start downloading.
+
+5. Use it responsibly and make sure you read the terms and conditions of websites before using the it
+
+----------------------------------------------------------------------------------------------------
+
+1. Also on sites with iframe, press 'Open Iframe' and it will show a preview of the file on drive or any other platform, press an icon on the top right and it will open the file again with drive, but now it will show the icon to download.
+
+2. This is the easiest method to download the document.
+
+3. We recommend using the extesnion on revision sites and newsblaze for revision materials and news
+
+
+
+********************************
+For any questions visit: fgrabber.onrender.com`;
 
       // Create File Grabber folder in zip
       const fileGrabberFolder = zip.folder("File Grabber");
