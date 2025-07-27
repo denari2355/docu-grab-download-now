@@ -443,9 +443,8 @@ const Index = () => {
                 <p>
                   Always respect copyright laws and website terms of use when downloading content. FileGrabber is intended for legitimate document access and should not be used to circumvent access controls or download copyrighted material without permission.
                 </p>
-                <p>
-                  The extension may not work on all websites due to security restrictions, CORS policies, or other technical limitations.
-                </p>
+                <p>The extension may not work on all websites due to security restrictions, CORS policies, or other technical limitations.
+More corrected version will be available soon</p>
               </div>
             </div>
             
