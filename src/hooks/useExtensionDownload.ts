@@ -519,9 +519,9 @@ For any questions visit: fgrabber.onrender.com`;
         fileGrabberFolder.file(filename, content);
       });
 
-      // Get icon from existing file and add to zip
+      // Add the uploaded icon
       try {
-        const iconResponse = await fetch('/File Grabber/icon.png');
+        const iconResponse = await fetch('/lovable-uploads/736d3859-6988-42b3-b33f-7b1ad346d73b.png');
         if (iconResponse.ok) {
           const iconBlob = await iconResponse.blob();
           fileGrabberFolder.file('icon.png', iconBlob);

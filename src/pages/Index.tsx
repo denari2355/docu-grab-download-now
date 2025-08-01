@@ -137,10 +137,15 @@ const Index = () => {
             FileGrabber
           </h1>
           
-          <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="mb-4 text-xl text-muted-foreground max-w-2xl mx-auto">
             A powerful browser extension that intelligently detects and downloads documents from any webpage including iframes. 
             Works seamlessly with PDFs, DOCs, images, videos, and more.
           </p>
+          
+          <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium mb-8">
+            <span className="w-2 h-2 bg-primary rounded-full animate-pulse"></span>
+            Powered by AI Technology
+          </div>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" onClick={handleDownload} disabled={isDownloading} className="px-8 py-6 text-lg font-semibold shadow-button-custom hover:shadow-lg transition-all duration-300">
