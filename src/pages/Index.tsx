@@ -163,6 +163,13 @@ const Index = () => {
               <span>Chrome & Edge Compatible</span>
             </div>
           </div>
+          
+          <div className="mt-6 flex justify-center">
+            <div className="inline-flex items-center gap-2 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 px-4 py-2 rounded-full text-sm font-medium border border-green-200 dark:border-green-800">
+              <Shield className="w-4 h-4" />
+              Tested and secure – no tracking or ads
+            </div>
+          </div>
         </div>
       </section>
 
