@@ -476,7 +476,7 @@ More corrected version will be available soon</p>
           </div>
           
           <div className="mt-12 pt-8 border-t text-center text-xs text-muted-foreground">
-            <p> 2025 FileGrabber. Built for enhanced productivity and seamless document management.</p>
+            <p> © 2025 FileGrabber. Built for enhanced productivity and seamless document management.</p>
           </div>
         </div>
       </section>
