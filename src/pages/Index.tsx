@@ -487,48 +487,6 @@ More corrected version will be available soon</p>
           </div>
         </div>
       </section>
-
-      {/* Iframe Explanation Section */}
-      <section className="max-w-4xl mx-auto px-6 py-16">
-        <div className="bg-card/50 backdrop-blur-sm rounded-2xl p-8 border border-border/50">
-          <h2 className="text-2xl font-bold text-foreground mb-6 text-center">
-            Understanding Iframes & FileGrabber's Power
-          </h2>
-          
-          <div className="space-y-6 text-muted-foreground">
-            <div className="bg-background/30 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">What is an Iframe?</h3>
-              <p className="leading-relaxed">
-                An iframe (inline frame) is like a "window within a window" on a webpage. It allows websites to embed 
-                content from other sources directly into their pages. Think of it as a picture frame that displays 
-                another website inside the current one you're viewing.
-              </p>
-            </div>
-
-            <div className="bg-background/30 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">How FileGrabber Handles Iframes</h3>
-              <p className="leading-relaxed mb-4">
-                Many websites use iframes to display documents (PDFs, presentations, etc.) that would normally be 
-                difficult to download. FileGrabber intelligently detects these embedded documents and provides you with:
-              </p>
-              <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>"Open Iframe"</strong> - Opens the iframe content in a new tab for direct access</li>
-                <li><strong>"Download Document"</strong> - Attempts to download the document directly from the iframe</li>
-                <li><strong>"Grab Hidden"</strong> - Finds downloadable files that might be hidden within the iframe</li>
-              </ul>
-            </div>
-
-            <div className="bg-background/30 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-3">Why This Matters</h3>
-              <p className="leading-relaxed">
-                Without FileGrabber, these embedded documents often can't be saved easily. Our extension breaks through 
-                these barriers, giving you access to content that websites might not want you to download directly - 
-                all while respecting website terms of service.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
     </div>;
 };
 export default Index;
