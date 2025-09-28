@@ -519,9 +519,9 @@ For any questions visit: fgrabber.onrender.com`;
         fileGrabberFolder.file(filename, content);
       });
 
-      // Add the uploaded icon
+      // Add the new extension icon
       try {
-        const iconResponse = await fetch('/lovable-uploads/736d3859-6988-42b3-b33f-7b1ad346d73b.png');
+        const iconResponse = await fetch('/extension-icon.png');
         if (iconResponse.ok) {
           const iconBlob = await iconResponse.blob();
           fileGrabberFolder.file('icon.png', iconBlob);
