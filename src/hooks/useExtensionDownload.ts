@@ -519,15 +519,24 @@ For any questions visit: fgrabber.onrender.com`;
         fileGrabberFolder.file(filename, content);
       });
 
-      // Add the new extension icon
+      // Add the new extension icon - ensure it's properly included for browser compatibility
       try {
         const iconResponse = await fetch('/extension-icon.png');
         if (iconResponse.ok) {
           const iconBlob = await iconResponse.blob();
+          // Add icon.png for main extension functionality
           fileGrabberFolder.file('icon.png', iconBlob);
+          
+          // Also add sized versions for better browser compatibility
+          fileGrabberFolder.file('icon16.png', iconBlob);
+          fileGrabberFolder.file('icon48.png', iconBlob);
+          fileGrabberFolder.file('icon128.png', iconBlob);
         }
       } catch (err) {
-        console.log('Could not load icon, skipping...');
+        console.log('Could not load icon, using default...');
+        // Fallback: create a simple base64 icon if main icon fails
+        const fallbackIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+        fileGrabberFolder.file('icon.png', fallbackIcon, {base64: true});
       }
 
       // Add README to root of zip
